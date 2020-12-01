@@ -46,7 +46,33 @@ export default class App extends Component{
         }
     }
 
+    toggleProperty = (property, id) => {
+        this.setState(({todoList}) => {
+            const newList = todoList.map((task) => {
+                if (task.id === id) {
+                    task[property] = !task[property];
+                }
+                return task;
+            });
+            return{
+                todoList: newList
+            }
+        });
+    }
+
+    onToggleCompleted = (id) => {
+        this.toggleProperty('completed', id);
+    }
+
+    onToggleEditing = (id) => {
+        this.toggleProperty('editing', id);
+    }
+
     render() {
+
+        const {todoList} = this.state;
+        const tasksLeft = todoList.filter((item) => !item.completed).length;
+
         return (
             <section className="todoapp">
                 <header className="header">
@@ -57,11 +83,14 @@ export default class App extends Component{
                 </header>
                 <section className="main">
                     <TaskList
-                        todos={this.state.todoList}
+                        todos={todoList}
                         onDeleted={this.deleteTask}
-
+                        onToggleEditing={this.onToggleEditing}
+                        onToggleCompleted={this.onToggleCompleted}
                     />
-                    <Footer />
+                    <Footer
+                        tasksLeft={tasksLeft}
+                    />
                 </section>
             </section>
         );
