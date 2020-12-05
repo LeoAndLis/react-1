@@ -1,17 +1,25 @@
 import React from 'react';
 
 const TaskFilter = ({filter, onFilterChange}) => {
+
+    const buttons = [
+        {label: 'All'},
+        {label: 'Active'},
+        {label: 'Completed'},
+    ]
+
     return (
         <ul className="filters">
-            <li>
-                <button className={filter === 'all' ? "selected":''} onClick={() => onFilterChange('all')}>All</button>
-            </li>
-            <li>
-                <button className={filter === 'active' ? "selected":''} onClick={() => onFilterChange('active')}>Active</button>
-            </li>
-            <li>
-                <button className={filter === 'completed' ? "selected":''} onClick={() => onFilterChange('completed')}>Completed</button>
-            </li>
+            {buttons.map((button) => {
+                return (
+                    <li>
+                        <button className={filter === button.label ? "selected":''}
+                                onClick={() => onFilterChange(button.label)}>
+                            {button.label}
+                        </button>
+                    </li>
+                );
+            })}
         </ul>
     );
 }

@@ -13,7 +13,7 @@ export default class App extends Component{
             this.createTask('Todo 2'),
             this.createTask('Todo 3'),
         ],
-        filter: 'all',
+        filter: 'All',
     }
 
     deleteTask = (id) => {
@@ -80,11 +80,11 @@ export default class App extends Component{
         const {todoList, filter} = this.state;
 
         switch(filter){
-            case 'completed':
+            case 'Completed':
                 return todoList.filter(task => task.completed);
-            case 'active':
+            case 'Active':
                 return todoList.filter(task => !task.completed);
-            case 'all':
+            case 'All':
             default:
                 return todoList
         };
