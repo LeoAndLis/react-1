@@ -4,10 +4,9 @@ export default class NewTaskForm extends Component {
 
     constructor(props) {
         super(props);
-    }
-
-    state = {
-        label: ''
+        this.state = {
+            label: ''
+        }
     }
 
     onLabelChange = (e) => {
@@ -16,23 +15,24 @@ export default class NewTaskForm extends Component {
         })
     }
 
-    onSubmit = (e) => {
-        e.preventDefault();
-        this.props.onAdd(this.state.label);
-        this.setState({
-            label: ''
-        });
+    onKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            this.props.onAdd(this.state.label);
+            this.setState({
+                label: ''
+            });
+        }
     }
 
     render() {
+        const {label} = this.state;
+
         return (
-            <form onSubmit={this.onSubmit}>
-                <input className="new-todo"
-                       placeholder="What needs to be done?"
-                       onChange={this.onLabelChange}
-                       autoFocus
-                value={this.state.label}/>
-            </form>
+            <input className="new-todo"
+                   placeholder="What needs to be done?"
+                   onChange={this.onLabelChange}
+                   onKeyDown={this.onKeyDown}
+                   value={label}/>
         );
     }
 }
