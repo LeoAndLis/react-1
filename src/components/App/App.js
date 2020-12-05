@@ -13,6 +13,7 @@ export default class App extends Component{
             this.createTask('Todo 2'),
             this.createTask('Todo 3'),
         ],
+        filter: 'all',
     }
 
     deleteTask = (id) => {
@@ -43,6 +44,7 @@ export default class App extends Component{
             id: this.maxId++,
             completed: false,
             editing: false,
+            date: new Date(),
         }
     }
 
@@ -68,10 +70,41 @@ export default class App extends Component{
         this.toggleProperty('editing', id);
     }
 
+    onFilterChange = (filterNewState) => {
+        this.setState({
+           filter: filterNewState
+        });
+    }
+
+    filterList = () => {
+        const {todoList, filter} = this.state;
+
+        switch(filter){
+            case 'completed':
+                return todoList.filter(task => task.completed);
+            case 'active':
+                return todoList.filter(task => !task.completed);
+            case 'all':
+            default:
+                return todoList
+        };
+    }
+
+    onDeleteCompleted = () => {
+        this.setState(({todoList}) => {
+            const newList = todoList.filter((task) => !task.completed);
+
+            return {
+                todoList: newList
+            }
+        });
+    }
+
     render() {
 
-        const {todoList} = this.state;
+        const {todoList, filter} = this.state;
         const tasksLeft = todoList.filter((item) => !item.completed).length;
+        const filteredTodoList = this.filterList();
 
         return (
             <section className="todoapp">
@@ -83,13 +116,16 @@ export default class App extends Component{
                 </header>
                 <section className="main">
                     <TaskList
-                        todos={todoList}
+                        todos={filteredTodoList}
                         onDeleted={this.deleteTask}
                         onToggleEditing={this.onToggleEditing}
                         onToggleCompleted={this.onToggleCompleted}
                     />
                     <Footer
                         tasksLeft={tasksLeft}
+                        filter={filter}
+                        onFilterChange={this.onFilterChange}
+                        onDeleteCompleted={this.onDeleteCompleted}
                     />
                 </section>
             </section>

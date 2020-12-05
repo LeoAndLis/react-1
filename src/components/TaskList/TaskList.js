@@ -2,13 +2,13 @@ import React from 'react';
 import Task from '../Task/Task';
 
 const TaskList = ({ todos, onDeleted, onToggleEditing, onToggleCompleted}) => {
-    const tasksList = todos.map((item) => {
+    const tasksList = todos.map((task) => {
         return <Task
-            key={item.id}
-            { ...item }
-            onDeleted={() => onDeleted(item.id)}
-            onToggleEditing={() => onToggleEditing(item.id)}
-            onToggleCompleted={() => onToggleCompleted(item.id)}
+            key={task.id}
+            { ...task }
+            onDeleted={() => onDeleted(task.id)}
+            onToggleEditing={() => onToggleEditing(task.id)}
+            onToggleCompleted={() => onToggleCompleted(task.id)}
         />;
     });
     return (
