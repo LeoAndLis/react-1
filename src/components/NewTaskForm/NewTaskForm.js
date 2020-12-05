@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropType from 'prop-types';
 
 export default class NewTaskForm extends Component {
 
@@ -35,4 +36,12 @@ export default class NewTaskForm extends Component {
                    value={label}/>
         );
     }
+}
+
+NewTaskForm.defaultProps = {
+    onAdd: () => {},
+}
+
+NewTaskForm.propTypes = {
+    onAdd: PropType.func,
 }
