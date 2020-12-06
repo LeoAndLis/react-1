@@ -3,10 +3,58 @@ import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 
 export default class Task extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            editValue: props.label,
+        }
+    }
+
+    onEditChange = (e) => {
+        this.setState({
+            editValue: e.target.value
+        })
+    }
+
+    onKeyDown = (e) => {
+
+        if (e.key === 'Escape') {
+            this.cancelEditing();
+        }
+        if (e.key === 'Enter') {
+            const {id, onEdit, onToggleEditing} = this.props;
+
+            onEdit(id, this.state.editValue);
+            onToggleEditing(id);
+        }
+    }
+
+    onBlur = () => {
+        this.cancelEditing();
+    }
+
+    cancelEditing = () => {
+
+        const {id, label, onToggleEditing} = this.props;
+
+        onToggleEditing(id);
+        this.setState({
+            editValue: label,
+        });
+    }
+
     render() {
         const {label, completed, editing, date, onDeleted, onToggleEditing, onToggleCompleted} = this.props;
         const className = `${completed ? 'completed' : ''} ${editing ? 'editing' : ''}`;
-        const editTask = <input type="text" className="edit" value={ label }/>;
+        const editTask = <input
+                                type="text"
+                                className="edit"
+                                autoFocus
+                                value={ this.state.editValue }
+                                onChange={this.onEditChange}
+                                onBlur={this.onBlur}
+                                onKeyDown={this.onKeyDown}/>;
 
         return (
             <li className={className}>
@@ -29,6 +77,7 @@ Task.defaultProps = {
     completed: false,
     editing: false,
     date: new Date(),
+    onEdit: () => {},
     onDeleted: () => {},
     onToggleEditing: () => {},
     onToggleCompleted: () => {},
@@ -39,6 +88,7 @@ Task.propTypes = {
     completed: PropTypes.bool,
     editing: PropTypes.bool,
     date: PropTypes.instanceOf(Date).isRequired,
+    onEdit: PropTypes.func,
     onDeleted: PropTypes.func,
     onToggleEditing: PropTypes.func,
     onToggleCompleted: PropTypes.func,

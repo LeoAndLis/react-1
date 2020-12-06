@@ -38,6 +38,21 @@ export default class App extends Component{
         });
     }
 
+    editTask = (id, label) => {
+        this.setState(({ todoList }) => {
+            const newList = todoList.map((task) => {
+                if (task.id === id) {
+                    task.label = label;
+                }
+                return task;
+            });
+
+            return {
+                todoList: newList
+            };
+        });
+    }
+
     createTask(label) {
         return {
             label,
@@ -117,6 +132,7 @@ export default class App extends Component{
                 <section className="main">
                     <TaskList
                         todos={filteredTodoList}
+                        onEdit={this.editTask}
                         onDeleted={this.deleteTask}
                         onToggleEditing={this.onToggleEditing}
                         onToggleCompleted={this.onToggleCompleted}
