@@ -6,6 +6,8 @@ export default class NewTaskForm extends Component {
     super(props);
     this.state = {
       label: '',
+      min: '',
+      sec: '',
     };
   }
 
@@ -16,16 +18,39 @@ export default class NewTaskForm extends Component {
   };
 
   onKeyDown = (e) => {
+    const { label, min, sec } = this.state;
     if (e.key === 'Enter') {
-      this.props.onAdd(this.state.label);
+      this.props.onAdd({ label, min, sec });
       this.setState({
         label: '',
+        min: '',
+        sec: '',
+      });
+    }
+  };
+
+  onMinutesChange = (e) => {
+    if (!isNaN(e.target.value)) {
+      this.setState({
+        min: e.target.value,
+      });
+    }
+  };
+
+  onSecondsChange = (e) => {
+    let secValue = e.target.value;
+    if (!isNaN(secValue)) {
+      if (+secValue > 59) {
+        secValue = 59;
+      }
+      this.setState({
+        sec: secValue,
       });
     }
   };
 
   render() {
-    const { label } = this.state;
+    const { label, min, sec } = this.state;
 
     return (
       <form className="new-todo-form">
@@ -36,8 +61,8 @@ export default class NewTaskForm extends Component {
           onKeyDown={this.onKeyDown}
           value={label}
         />
-        <input className="new-todo-form__timer" placeholder="Min" autoFocus="" />
-        <input className="new-todo-form__timer" placeholder="Sec" autoFocus="" />
+        <input className="new-todo-form__timer" placeholder="Min" onChange={this.onMinutesChange} value={min} />
+        <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onSecondsChange} value={sec} />
       </form>
     );
   }

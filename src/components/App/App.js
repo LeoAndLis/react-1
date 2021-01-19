@@ -21,8 +21,9 @@ export default class App extends Component {
     });
   };
 
-  addTask = (text) => {
-    const newTask = this.createTask(text);
+  addTask = (data) => {
+    const { label, min, sec } = data;
+    const newTask = this.createTask(label, min, sec);
 
     this.setState(({ todoList }) => {
       const newList = [...todoList, newTask];
@@ -48,13 +49,15 @@ export default class App extends Component {
     });
   };
 
-  createTask(label) {
+  createTask(label, min = 0, sec = 0) {
+    const timeSpent = min * 60 + +sec;
     return {
       label,
       id: this.maxId++,
       completed: false,
       editing: false,
       date: new Date(),
+      timeSpent,
     };
   }
 

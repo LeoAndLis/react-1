@@ -1,14 +1,45 @@
 import React, { Component } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
+import formatTimeSpent from '../../helpers/FormatTimeSpent';
 
 export default class Task extends Component {
+  timerId = null;
+
   constructor(props) {
     super(props);
     this.state = {
       editValue: props.label,
+      timeSpent: props.timeSpent,
     };
   }
+
+  startTimer = () => {
+    if (this.timerId === null) {
+      this.timerId = setInterval(this.increaseTimeSpent, 1000);
+    }
+  };
+
+  stopTimer = () => {
+    this.deleteInterval();
+  };
+
+  deleteInterval = () => {
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+    }
+  };
+
+  componentWillUnmount() {
+    this.deleteInterval();
+  }
+
+  increaseTimeSpent = () => {
+    this.setState(({ timeSpent }) => {
+      const newTimeSpent = timeSpent + 1;
+      return { timeSpent: newTimeSpent };
+    });
+  };
 
   onEditChange = (e) => {
     this.setState({
@@ -42,6 +73,7 @@ export default class Task extends Component {
   };
 
   render() {
+    const { editValue, timeSpent } = this.state;
     const { label, completed, editing, date, onDeleted, onToggleEditing, onToggleCompleted } = this.props;
     const className = `${completed ? 'completed' : ''} ${editing ? 'editing' : ''}`;
     const editTask = (
@@ -49,12 +81,14 @@ export default class Task extends Component {
         type="text"
         className="edit"
         autoFocus
-        value={this.state.editValue}
+        value={editValue}
         onChange={this.onEditChange}
         onBlur={this.onBlur}
         onKeyDown={this.onKeyDown}
       />
     );
+
+    const formattedTimeSpent = formatTimeSpent(timeSpent);
 
     return (
       <li className={className}>
@@ -63,9 +97,9 @@ export default class Task extends Component {
           <label>
             <span className="title">{label}</span>
             <span className="description">
-              <button className="icon icon-play"></button>
-              <button className="icon icon-pause"></button>
-              <span className="time-spent">12:25</span>
+              <button className="icon icon-play" onClick={this.startTimer} />
+              <button className="icon icon-pause" onClick={this.stopTimer} />
+              <span className="time-spent">{formattedTimeSpent}</span>
             </span>
             <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
           </label>
