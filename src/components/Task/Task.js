@@ -61,7 +61,12 @@ export default class Task extends Component {
         <div className="view">
           <input className="toggle" type="checkbox" onClick={onToggleCompleted} defaultChecked={completed} />
           <label>
-            <span className="description">{label}</span>
+            <span className="title">{label}</span>
+            <span className="description">
+              <button className="icon icon-play"></button>
+              <button className="icon icon-pause"></button>
+              <span className="time-spent">12:25</span>
+            </span>
             <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
           </label>
           <button className="icon icon-edit" onClick={onToggleEditing} />
