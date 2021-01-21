@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import formatTimeSpent from '../../helpers/FormatTimeSpent';
+import classNames from 'classnames';
 
 export default class Task extends Component {
   timerId = null;
@@ -58,7 +59,6 @@ export default class Task extends Component {
       onStartTimer,
       onStopTimer,
     } = this.props;
-    const className = `${completed ? 'completed' : ''} ${editing ? 'editing' : ''}`;
     const editTask = (
       <input
         type="text"
@@ -74,7 +74,7 @@ export default class Task extends Component {
     const formattedTimeSpent = formatTimeSpent(timeSpent);
 
     return (
-      <li className={className}>
+      <li className={classNames({ completed: completed }, { editing: editing })}>
         <div className="view">
           <input className="toggle" type="checkbox" onClick={onToggleCompleted} defaultChecked={completed} />
           <label>
@@ -103,9 +103,12 @@ Task.defaultProps = {
   onDeleted: () => {},
   onToggleEditing: () => {},
   onToggleCompleted: () => {},
+  onStartTimer: () => {},
+  onStopTimer: () => {},
 };
 
 Task.propTypes = {
+  id: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   completed: PropTypes.bool,
   editing: PropTypes.bool,
@@ -114,4 +117,6 @@ Task.propTypes = {
   onDeleted: PropTypes.func,
   onToggleEditing: PropTypes.func,
   onToggleCompleted: PropTypes.func,
+  onStartTimer: PropTypes.func,
+  onStopTimer: PropTypes.func,
 };
