@@ -10,36 +10,8 @@ export default class Task extends Component {
     super(props);
     this.state = {
       editValue: props.label,
-      timeSpent: props.timeSpent,
     };
   }
-
-  startTimer = () => {
-    if (this.timerId === null) {
-      this.timerId = setInterval(this.increaseTimeSpent, 1000);
-    }
-  };
-
-  stopTimer = () => {
-    this.deleteInterval();
-  };
-
-  deleteInterval = () => {
-    if (this.timerId !== null) {
-      clearInterval(this.timerId);
-    }
-  };
-
-  componentWillUnmount() {
-    this.deleteInterval();
-  }
-
-  increaseTimeSpent = () => {
-    this.setState(({ timeSpent }) => {
-      const newTimeSpent = timeSpent + 1;
-      return { timeSpent: newTimeSpent };
-    });
-  };
 
   onEditChange = (e) => {
     this.setState({
@@ -73,8 +45,8 @@ export default class Task extends Component {
   };
 
   render() {
-    const { editValue, timeSpent } = this.state;
-    const { label, completed, editing, date, onDeleted, onToggleEditing, onToggleCompleted } = this.props;
+    const { editValue } = this.state;
+    const { label, completed, editing, date, timeSpent, onDeleted, onToggleEditing, onToggleCompleted, onStartTimer, onStopTimer } = this.props;
     const className = `${completed ? 'completed' : ''} ${editing ? 'editing' : ''}`;
     const editTask = (
       <input
@@ -97,8 +69,8 @@ export default class Task extends Component {
           <label>
             <span className="title">{label}</span>
             <span className="description">
-              <button className="icon icon-play" onClick={this.startTimer} />
-              <button className="icon icon-pause" onClick={this.stopTimer} />
+              <button className="icon icon-play" onClick={onStartTimer} />
+              <button className="icon icon-pause" onClick={onStopTimer} />
               <span className="time-spent">{formattedTimeSpent}</span>
             </span>
             <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>

@@ -2,16 +2,18 @@ import React from 'react';
 import Task from '../Task/Task';
 import PropTypes from 'prop-types';
 
-const TaskList = ({ todos, onEdit, onDeleted, onToggleEditing, onToggleCompleted }) => {
-  const tasksList = todos.map((task) => {
+const TaskList = ({ todos, onEdit, onDeleted, onToggleEditing, onToggleCompleted, onStartTimer, onStopTimer }) => {
+  const tasksList = todos.map((task, index) => {
     return (
       <Task
         key={task.id}
         {...task}
         onEdit={onEdit}
-        onDeleted={() => onDeleted(task.id)}
+        onDeleted={() => onDeleted(task.id, index)}
         onToggleEditing={() => onToggleEditing(task.id)}
         onToggleCompleted={() => onToggleCompleted(task.id)}
+        onStartTimer={() => onStartTimer(index)}
+        onStopTimer={() => onStopTimer(index)}
       />
     );
   });
