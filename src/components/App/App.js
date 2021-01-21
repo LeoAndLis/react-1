@@ -11,14 +11,61 @@ export default class App extends Component {
     filter: 'All',
   };
 
-  deleteTask = (id) => {
+  startTimer = (taskIndex) => {
+    console.log('start timer');
+    const { todoList } = this.state;
+    if (todoList[taskIndex].timerId === null) {
+      const timerId = setInterval(() => this.increaseTimeSpent(taskIndex), 1000);
+      this.setState(({ todoList: oldTodoList }) => {
+        const todoList = oldTodoList;
+        todoList[taskIndex].timerId = timerId;
+
+        return { todoList };
+      });
+    }
+  };
+
+  increaseTimeSpent = (taskIndex) => {
+    console.log(`increase timeSpent for ${taskIndex}`);
+    this.setState(({ todoList: oldTodoList }) => {
+      const todoList = oldTodoList;
+      console.log(todoList[taskIndex].timeSpent);
+      todoList[taskIndex].timeSpent += 1;
+      console.log(todoList[taskIndex].timeSpent);
+
+      return { todoList };
+    });
+  };
+
+  stopTimer = (taskIndex) => {
+    console.log('stop timer');
+    const { todoList } = this.state;
+    if (todoList[taskIndex].timerId !== null) {
+      clearInterval(todoList[taskIndex].timerId);
+      this.setState(({ todoList: oldTodoList }) => {
+        const todoList = oldTodoList;
+        todoList[taskIndex].timerId = null;
+
+        return { todoList };
+      });
+    }
+  };
+
+  deleteTask = (id, taskIndex) => {
     this.setState(({ todoList }) => {
-      const newList = todoList.filter((el) => el.id !== id);
+      const newList = todoList.filter((el) => {
+        if (el.id === id) {
+          console.log('clear interval on deleting task');
+          clearInterval(el.timerId);
+        }
+        return el.id !== id;
+      });
 
       return {
         todoList: newList,
       };
     });
+    console.log(this.state.todoList);
   };
 
   addTask = (data) => {
@@ -58,6 +105,7 @@ export default class App extends Component {
       editing: false,
       date: new Date(),
       timeSpent,
+      timerId: null,
     };
   }
 
@@ -131,6 +179,8 @@ export default class App extends Component {
             onDeleted={this.deleteTask}
             onToggleEditing={this.onToggleEditing}
             onToggleCompleted={this.onToggleCompleted}
+            onStartTimer={this.startTimer}
+            onStopTimer={this.stopTimer}
           />
           <Footer
             tasksLeft={tasksLeft}
