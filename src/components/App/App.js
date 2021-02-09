@@ -1,117 +1,15 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from '../TaskList/TaskList';
 import Footer from '../Footer/Footer';
 import NewTaskForm from '../NewTaskForm/NewTaskForm';
 
-export default class App extends Component {
-  maxId = 100;
+let maxId = 100;
 
-  state = {
-    todoList: new Map(),
-    filter: 'All',
-  };
+const App = () => {
+  const [todoList, setTodoList] = useState(null);
+  const [filter, setFilter] = useState('All');
 
-  componentDidMount() {
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
-      todoList
-        .set(this.maxId++, this.createTask('Task 1'))
-        .set(this.maxId++, this.createTask('Task 2'))
-        .set(this.maxId++, this.createTask('Task 3'));
-      return {
-        todoList,
-      };
-    });
-  }
-
-  startTimer = (taskId) => {
-    const { todoList } = this.state;
-    const task = todoList.get(taskId);
-    if (task.timerId === null) {
-      const timerId = setInterval(() => this.increaseTimeSpent(taskId), 1000);
-      this.setState(({ todoList: oldTodoList }) => {
-        const todoList = new Map([...oldTodoList]);
-        const task = todoList.get(taskId);
-        task.timerId = timerId;
-        todoList.set(taskId, task);
-
-        return {
-          todoList,
-        };
-      });
-    }
-  };
-
-  increaseTimeSpent = (taskId) => {
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
-      const task = todoList.get(taskId);
-      task.timeSpent += 1;
-      todoList.set(taskId, task);
-
-      return {
-        todoList,
-      };
-    });
-  };
-
-  stopTimer = (taskId) => {
-    const { todoList } = this.state;
-    const task = todoList.get(taskId);
-    if (task.timerId !== null) {
-      clearInterval(task.timerId);
-      this.setState(({ todoList: oldTodoList }) => {
-        const todoList = new Map([...oldTodoList]);
-        const task = todoList.get(taskId);
-        task.timerId = null;
-        todoList.set(taskId, task);
-
-        return {
-          todoList,
-        };
-      });
-    }
-  };
-
-  deleteTask = (taskId) => {
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
-      const task = todoList.get(taskId);
-      clearInterval(task.timerId);
-      todoList.delete(taskId);
-      return {
-        todoList,
-      };
-    });
-  };
-
-  addTask = (data) => {
-    const { label, min, sec } = data;
-    const newTask = this.createTask(label, min, sec);
-
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
-      todoList.set(this.maxId++, newTask);
-      return {
-        todoList,
-      };
-    });
-  };
-
-  editTask = (id, label) => {
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
-      const task = todoList.get(id);
-      task.label = label;
-      todoList.set(id, task);
-
-      return {
-        todoList,
-      };
-    });
-  };
-
-  createTask(label, min = 0, sec = 0) {
+  const createTask = (label, min = 0, sec = 0) => {
     const timeSpent = min * 60 + +sec;
     return {
       label,
@@ -121,119 +19,174 @@ export default class App extends Component {
       timeSpent,
       timerId: null,
     };
-  }
-
-  toggleProperty = (id, property) => {
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
-      const task = todoList.get(id);
-      task[property] = !task[property];
-      todoList.set(id, task);
-
-      return {
-        todoList,
-      };
-    });
   };
 
-  onToggleCompleted = (id) => {
-    this.toggleProperty(id, 'completed');
-  };
+  useEffect(
+    () =>
+      setTodoList({
+        [maxId++]: createTask('Task 1'),
+        [maxId++]: createTask('Task 2'),
+        [maxId++]: createTask('Task 3'),
+      }),
+    []
+  );
 
-  onToggleEditing = (id) => {
-    this.toggleProperty(id, 'editing');
-  };
-
-  onFilterChange = (filterNewState) => {
-    this.setState({
-      filter: filterNewState,
-    });
-  };
-
-  filterList = () => {
-    const { todoList: oldTodoList, filter } = this.state;
-    const todoList = new Map([...oldTodoList]);
-
-    switch (filter) {
-      case 'Completed':
-        todoList.forEach((task, id) => {
-          if (!task.completed) {
-            todoList.delete(id);
-          }
-        });
-        return todoList;
-      case 'Active':
-        todoList.forEach((task, id) => {
-          if (task.completed) {
-            todoList.delete(id);
-          }
-        });
-        return todoList;
-      case 'All':
-      default:
-        return todoList;
+  const startTimer = (taskId) => {
+    const task = todoList[taskId];
+    if (task.timerId === null) {
+      const timerId = setInterval(() => increaseTimeSpent(taskId), 1000);
+      const newTodoList = { ...todoList };
+      newTodoList[taskId].timerId = timerId;
+      setTodoList(newTodoList);
     }
   };
 
-  countActiveTasks = () => {
-    const { todoList } = this.state;
+  const increaseTimeSpent = (taskId) => {
+    const newTodoList = { ...todoList };
+    newTodoList[taskId].timeSpent += 1;
+    setTodoList(newTodoList);
+  };
+
+  const stopTimer = (taskId) => {
+    const task = todoList[taskId];
+    if (task.timerId !== null) {
+      clearInterval(task.timerId);
+      const newTodoList = { ...todoList };
+      newTodoList[taskId].timerId = null;
+      setTodoList({
+        ...todoList,
+        [taskId]: newTodoList[taskId],
+      });
+    }
+  };
+
+  const deleteTask = (taskId) => {
+    const newTodoList = { ...todoList };
+    delete newTodoList[taskId];
+    setTodoList({ ...newTodoList });
+    console.log(todoList);
+  };
+
+  const addTask = (data) => {
+    const { label, min, sec } = data;
+    if (label.length > 0) {
+      const newTask = createTask(label, min, sec);
+
+      setTodoList({
+        ...todoList,
+        [maxId++]: newTask,
+      });
+      console.log(todoList);
+    }
+  };
+
+  const editTask = (taskId, label) => {
+    const newTodoList = { ...todoList };
+    newTodoList[taskId].label = label;
+    setTodoList({
+      ...todoList,
+      [taskId]: newTodoList[taskId],
+    });
+  };
+
+  const toggleProperty = (taskId, property) => {
+    const newTodoList = { ...todoList };
+    newTodoList[taskId][property] = !newTodoList[taskId][property];
+    setTodoList({
+      ...todoList,
+      [taskId]: newTodoList[taskId],
+    });
+  };
+
+  const onToggleCompleted = (id) => {
+    toggleProperty(id, 'completed');
+  };
+
+  const onToggleEditing = (id) => {
+    toggleProperty(id, 'editing');
+  };
+
+  const onFilterChange = (filterNewState) => {
+    setFilter(filterNewState);
+  };
+
+  const filterList = () => {
+    const newTodoList = { ...todoList };
+
+    switch (filter) {
+      case 'Completed':
+        for (let taskId in newTodoList) {
+          if (!newTodoList[taskId].completed) {
+            delete newTodoList[taskId];
+          }
+        }
+        return newTodoList;
+      case 'Active':
+        for (let taskId in newTodoList) {
+          if (newTodoList[taskId].completed) {
+            delete newTodoList[taskId];
+          }
+        }
+        return newTodoList;
+      case 'All':
+      default:
+        return newTodoList;
+    }
+  };
+
+  const countActiveTasks = () => {
     let tasksLeft = 0;
 
-    todoList.forEach((task) => {
-      if (!task.completed) {
+    for (let taskId in todoList) {
+      if (!todoList[taskId].completed) {
         tasksLeft++;
       }
-    });
+    }
 
     return tasksLeft;
   };
 
-  onDeleteCompleted = () => {
-    this.setState(({ todoList: oldTodoList }) => {
-      const todoList = new Map([...oldTodoList]);
+  const onDeleteCompleted = () => {
+    const newTodoList = { ...todoList };
 
-      todoList.forEach((task, id) => {
-        if (task.completed) {
-          clearInterval(task.timerId);
-          todoList.delete(id);
-        }
-      });
+    for (let taskId in newTodoList) {
+      if (newTodoList[taskId].completed) {
+        clearInterval(newTodoList[taskId].timerId);
+        delete newTodoList[taskId];
+      }
+    }
 
-      return {
-        todoList,
-      };
-    });
+    setTodoList(newTodoList);
   };
 
-  render() {
-    const { filter } = this.state;
-    const filteredTodoList = this.filterList();
-    let tasksLeft = this.countActiveTasks();
+  const filteredTodoList = filterList();
+  let tasksLeft = countActiveTasks();
 
-    return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-          <NewTaskForm onAdd={this.addTask} />
-        </header>
-        <section className="main">
-          <TaskList
-            todos={filteredTodoList}
-            onEdit={this.editTask}
-            onDeleted={this.deleteTask}
-            onToggleEditing={this.onToggleEditing}
-            onToggleCompleted={this.onToggleCompleted}
-            onStartTimer={this.startTimer}
-            onStopTimer={this.stopTimer}
-          />
-          <Footer
-            tasksLeft={tasksLeft}
-            filter={filter}
-            onFilterChange={this.onFilterChange}
-            onDeleteCompleted={this.onDeleteCompleted}
-          />
-        </section>
+  return (
+    <section className="todoapp">
+      <header className="header">
+        <h1>todos</h1>
+        <NewTaskForm onAdd={addTask} />
+      </header>
+      <section className="main">
+        <TaskList
+          todos={filteredTodoList}
+          onEdit={editTask}
+          onDeleted={deleteTask}
+          onToggleEditing={onToggleEditing}
+          onToggleCompleted={onToggleCompleted}
+          onStartTimer={startTimer}
+          onStopTimer={stopTimer}
+        />
+        <Footer
+          tasksLeft={tasksLeft}
+          filter={filter}
+          onFilterChange={onFilterChange}
+          onDeleteCompleted={onDeleteCompleted}
+        />
       </section>
-    );
-  }
-}
+    </section>
+  );
+};
+
+export default App;

@@ -1,99 +1,74 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import formatTimeSpent from '../../helpers/FormatTimeSpent';
 import classNames from 'classnames';
 
-export default class Task extends Component {
-  timerId = null;
+const Task = ({
+  completed,
+  date,
+  editing,
+  label,
+  id,
+  timeSpent,
+  onDeleted,
+  onEdit,
+  onToggleEditing,
+  onToggleCompleted,
+  onStartTimer,
+  onStopTimer,
+}) => {
+  const [editValue, setEditValue] = useState(label);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      editValue: props.label,
-    };
-  }
-
-  onEditChange = (e) => {
-    this.setState({
-      editValue: e.target.value,
-    });
-  };
-
-  onKeyDown = (e) => {
+  const onKeyDown = (e) => {
     if (e.key === 'Escape') {
-      this.cancelEditing();
+      cancelEditing();
     }
     if (e.key === 'Enter') {
-      const { id, onEdit, onToggleEditing } = this.props;
-
-      onEdit(id, this.state.editValue);
+      onEdit(id, editValue);
       onToggleEditing(id);
     }
   };
 
-  onBlur = () => {
-    this.cancelEditing();
-  };
-
-  cancelEditing = () => {
-    const { id, label, onToggleEditing } = this.props;
-
+  const cancelEditing = () => {
     onToggleEditing(id);
-    this.setState({
-      editValue: label,
-    });
+    setEditValue(label);
   };
 
-  render() {
-    const { editValue } = this.state;
-    const {
-      label,
-      completed,
-      editing,
-      date,
-      timeSpent,
-      onDeleted,
-      onToggleEditing,
-      onToggleCompleted,
-      onStartTimer,
-      onStopTimer,
-    } = this.props;
-    const editTask = (
-      <input
-        type="text"
-        className="edit"
-        autoFocus
-        value={editValue}
-        onChange={this.onEditChange}
-        onBlur={this.onBlur}
-        onKeyDown={this.onKeyDown}
-      />
-    );
+  const editTask = (
+    <input
+      type="text"
+      className="edit"
+      autoFocus
+      value={editValue}
+      onChange={(e) => setEditValue(e.target.value)}
+      onBlur={cancelEditing}
+      onKeyDown={onKeyDown}
+    />
+  );
 
-    const formattedTimeSpent = formatTimeSpent(timeSpent);
+  const formattedTimeSpent = formatTimeSpent(timeSpent);
 
-    return (
-      <li className={classNames({ completed: completed }, { editing: editing })}>
-        <div className="view">
-          <input className="toggle" type="checkbox" onClick={onToggleCompleted} defaultChecked={completed} />
-          <label>
-            <span className="title">{label}</span>
-            <span className="description">
-              <button className="icon icon-play" onClick={onStartTimer} />
-              <button className="icon icon-pause" onClick={onStopTimer} />
-              <span className="time-spent">{formattedTimeSpent}</span>
-            </span>
-            <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
-          </label>
-          <button className="icon icon-edit" onClick={onToggleEditing} />
-          <button className="icon icon-destroy" onClick={onDeleted} />
-        </div>
-        {editing ? editTask : null}
-      </li>
-    );
-  }
-}
+  return (
+    <li className={classNames({ completed: completed }, { editing: editing })}>
+      <div className="view">
+        <input className="toggle" type="checkbox" onClick={onToggleCompleted} defaultChecked={completed} />
+        <label>
+          <span className="title">{label}</span>
+          <span className="description">
+            <button className="icon icon-play" onClick={onStartTimer} />
+            <button className="icon icon-pause" onClick={onStopTimer} />
+            <span className="time-spent">{formattedTimeSpent}</span>
+          </span>
+          <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
+        </label>
+        <button className="icon icon-edit" onClick={onToggleEditing} />
+        <button className="icon icon-destroy" onClick={onDeleted} />
+      </div>
+      {editing ? editTask : null}
+    </li>
+  );
+};
 
 Task.defaultProps = {
   completed: false,
@@ -108,7 +83,7 @@ Task.defaultProps = {
 };
 
 Task.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   completed: PropTypes.bool,
   editing: PropTypes.bool,
@@ -120,3 +95,5 @@ Task.propTypes = {
   onStartTimer: PropTypes.func,
   onStopTimer: PropTypes.func,
 };
+
+export default Task;

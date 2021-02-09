@@ -4,22 +4,22 @@ import PropTypes from 'prop-types';
 
 const TaskList = ({ todos, onEdit, onDeleted, onToggleEditing, onToggleCompleted, onStartTimer, onStopTimer }) => {
   let tasksList = [];
-  todos.forEach((task, id) => {
+  for (let taskId in todos) {
     tasksList = [
       ...tasksList,
       <Task
-        id={id}
-        key={id}
-        {...task}
+        id={taskId}
+        key={taskId}
+        {...todos[taskId]}
         onEdit={onEdit}
-        onDeleted={() => onDeleted(id)}
-        onToggleEditing={() => onToggleEditing(id)}
-        onToggleCompleted={() => onToggleCompleted(id)}
-        onStartTimer={() => onStartTimer(id)}
-        onStopTimer={() => onStopTimer(id)}
+        onDeleted={() => onDeleted(taskId)}
+        onToggleEditing={() => onToggleEditing(taskId)}
+        onToggleCompleted={() => onToggleCompleted(taskId)}
+        onStartTimer={() => onStartTimer(taskId)}
+        onStopTimer={() => onStopTimer(taskId)}
       />,
     ];
-  });
+  }
 
   return <ul className="todo-list">{tasksList}</ul>;
 };
@@ -34,7 +34,7 @@ TaskList.defaultProps = {
 };
 
 TaskList.propTypes = {
-  todos: PropTypes.instanceOf(Map).isRequired,
+  todos: PropTypes.instanceOf(Object).isRequired,
   onEdit: PropTypes.func,
   onDeleted: PropTypes.func,
   onToggleEditing: PropTypes.func,
