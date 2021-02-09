@@ -5,20 +5,22 @@ import PropTypes from 'prop-types';
 const TaskList = ({ todos, onEdit, onDeleted, onToggleEditing, onToggleCompleted, onStartTimer, onStopTimer }) => {
   let tasksList = [];
   for (let taskId in todos) {
-    tasksList = [
-      ...tasksList,
-      <Task
-        id={taskId}
-        key={taskId}
-        {...todos[taskId]}
-        onEdit={onEdit}
-        onDeleted={() => onDeleted(taskId)}
-        onToggleEditing={() => onToggleEditing(taskId)}
-        onToggleCompleted={() => onToggleCompleted(taskId)}
-        onStartTimer={() => onStartTimer(taskId)}
-        onStopTimer={() => onStopTimer(taskId)}
-      />,
-    ];
+    if (todos.hasOwnProperty(taskId)) {
+      tasksList = [
+        ...tasksList,
+        <Task
+          id={taskId}
+          key={taskId}
+          {...todos[taskId]}
+          onEdit={onEdit}
+          onDeleted={() => onDeleted(taskId)}
+          onToggleEditing={() => onToggleEditing(taskId)}
+          onToggleCompleted={() => onToggleCompleted(taskId)}
+          onStartTimer={() => onStartTimer(taskId)}
+          onStopTimer={() => onStopTimer(taskId)}
+        />,
+      ];
+    }
   }
 
   return <ul className="todo-list">{tasksList}</ul>;

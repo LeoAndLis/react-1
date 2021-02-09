@@ -44,7 +44,12 @@ const App = () => {
   const increaseTimeSpent = (taskId) => {
     const newTodoList = { ...todoList };
     newTodoList[taskId].timeSpent += 1;
-    setTodoList(newTodoList);
+    setTodoList((todoList) => {
+      return {
+        ...todoList,
+        [taskId]: newTodoList[taskId],
+      };
+    });
   };
 
   const stopTimer = (taskId) => {
@@ -53,49 +58,45 @@ const App = () => {
       clearInterval(task.timerId);
       const newTodoList = { ...todoList };
       newTodoList[taskId].timerId = null;
-      setTodoList({
-        ...todoList,
-        [taskId]: newTodoList[taskId],
+      setTodoList((todoList) => {
+        return {
+          ...todoList,
+          [taskId]: newTodoList[taskId],
+        };
       });
     }
   };
 
   const deleteTask = (taskId) => {
     const newTodoList = { ...todoList };
+    if (newTodoList[taskId].timerId) {
+      stopTimer(taskId);
+    }
     delete newTodoList[taskId];
     setTodoList({ ...newTodoList });
-    console.log(todoList);
   };
 
   const addTask = (data) => {
     const { label, min, sec } = data;
     if (label.length > 0) {
       const newTask = createTask(label, min, sec);
-
       setTodoList({
         ...todoList,
         [maxId++]: newTask,
       });
-      console.log(todoList);
     }
   };
 
   const editTask = (taskId, label) => {
     const newTodoList = { ...todoList };
     newTodoList[taskId].label = label;
-    setTodoList({
-      ...todoList,
-      [taskId]: newTodoList[taskId],
-    });
+    setTodoList(newTodoList);
   };
 
   const toggleProperty = (taskId, property) => {
     const newTodoList = { ...todoList };
     newTodoList[taskId][property] = !newTodoList[taskId][property];
-    setTodoList({
-      ...todoList,
-      [taskId]: newTodoList[taskId],
-    });
+    setTodoList(newTodoList);
   };
 
   const onToggleCompleted = (id) => {
@@ -116,14 +117,14 @@ const App = () => {
     switch (filter) {
       case 'Completed':
         for (let taskId in newTodoList) {
-          if (!newTodoList[taskId].completed) {
+          if (newTodoList.hasOwnProperty(taskId) && !newTodoList[taskId].completed) {
             delete newTodoList[taskId];
           }
         }
         return newTodoList;
       case 'Active':
         for (let taskId in newTodoList) {
-          if (newTodoList[taskId].completed) {
+          if (newTodoList.hasOwnProperty(taskId) && newTodoList[taskId].completed) {
             delete newTodoList[taskId];
           }
         }
@@ -138,7 +139,7 @@ const App = () => {
     let tasksLeft = 0;
 
     for (let taskId in todoList) {
-      if (!todoList[taskId].completed) {
+      if (todoList.hasOwnProperty(taskId) && !todoList[taskId].completed) {
         tasksLeft++;
       }
     }
@@ -150,7 +151,7 @@ const App = () => {
     const newTodoList = { ...todoList };
 
     for (let taskId in newTodoList) {
-      if (newTodoList[taskId].completed) {
+      if (newTodoList.hasOwnProperty(taskId) && newTodoList[taskId].completed) {
         clearInterval(newTodoList[taskId].timerId);
         delete newTodoList[taskId];
       }
@@ -165,7 +166,7 @@ const App = () => {
   return (
     <section className="todoapp">
       <header className="header">
-        <h1>todos</h1>
+        <h1>todos on hooks</h1>
         <NewTaskForm onAdd={addTask} />
       </header>
       <section className="main">
