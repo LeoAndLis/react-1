@@ -1,72 +1,60 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropType from 'prop-types';
 
-export default class NewTaskForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      label: '',
-      min: '',
-      sec: '',
-    };
-  }
+const NewTaskForm = ({ onAdd }) => {
+  const [label, setLabel] = useState('');
+  const [time, setTime] = useState({ min: '', sec: '' });
 
-  onLabelChange = (e) => {
-    this.setState({
-      label: e.target.value,
-    });
-  };
-
-  onKeyDown = (e) => {
-    const { label, min, sec } = this.state;
+  const onKeyDown = (e) => {
     if (e.key === 'Enter') {
-      this.props.onAdd({ label, min, sec });
-      this.setState({
-        label: '',
-        min: '',
-        sec: '',
-      });
+      onAdd({ label, ...time });
+      setLabel('');
+      setTime({ min: '', sec: '' });
     }
   };
 
-  onMinutesChange = (e) => {
+  const onMinutesChange = (e) => {
     if (!isNaN(e.target.value)) {
-      this.setState({
-        min: e.target.value,
-      });
+      setTime({ ...time, min: e.target.value });
     }
   };
 
-  onSecondsChange = (e) => {
+  const onSecondsChange = (e) => {
     let secValue = e.target.value;
     if (!isNaN(secValue)) {
       if (+secValue > 59) {
         secValue = 59;
       }
-      this.setState({
-        sec: secValue,
-      });
+      setTime({ ...time, sec: secValue });
     }
   };
 
-  render() {
-    const { label, min, sec } = this.state;
-
-    return (
-      <form className="new-todo-form">
-        <input
-          className="new-todo"
-          placeholder="What needs to be done?"
-          onChange={this.onLabelChange}
-          onKeyDown={this.onKeyDown}
-          value={label}
-        />
-        <input className="new-todo-form__timer" placeholder="Min" onChange={this.onMinutesChange} value={min} />
-        <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onSecondsChange} value={sec} />
-      </form>
-    );
-  }
-}
+  return (
+    <form className="new-todo-form">
+      <input
+        className="new-todo"
+        placeholder="What needs to be done?"
+        onChange={(e) => setLabel(e.target.value)}
+        onKeyDown={onKeyDown}
+        value={label}
+      />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Min"
+        onChange={onMinutesChange}
+        onKeyDown={onKeyDown}
+        value={time.min}
+      />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Sec"
+        onChange={onSecondsChange}
+        onKeyDown={onKeyDown}
+        value={time.sec}
+      />
+    </form>
+  );
+};
 
 NewTaskForm.defaultProps = {
   onAdd: () => {},
@@ -75,3 +63,5 @@ NewTaskForm.defaultProps = {
 NewTaskForm.propTypes = {
   onAdd: PropType.func,
 };
+
+export default NewTaskForm;
